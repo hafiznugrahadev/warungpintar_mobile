@@ -1,0 +1,56 @@
+name: warungpintar_mobile
+description: "WarungPintar — multi-store POS & inventory for small shops."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Networking
+  dio: ^5.8.0+1
+  pretty_dio_logger: ^1.4.0
+
+  # State management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^15.1.2
+
+  # Secure storage
+  flutter_secure_storage: ^9.2.4
+
+  # Barcode scanner
+  mobile_scanner: ^6.0.10
+
+  # i18n (slang — type-safe translations)
+  slang: ^4.5.0
+  slang_flutter: ^4.5.0
+  intl: ^0.20.2
+
+  # Code generation
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # UI utilities
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.14
+  riverpod_generator: ^2.6.3
+  slang_build_runner: ^4.5.0
+  freezed: ^2.5.8
+  json_serializable: ^6.9.3
+
+flutter:
+  uses-material-design: true
+  generate: true
