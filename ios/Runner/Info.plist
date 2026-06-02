@@ -66,5 +66,31 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- Allow HTTP (non-HTTPS) for local dev API — remove for production or use HTTPS -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+
+	<!-- Google Sign-In OAuth callback.
+	     Replace the scheme below with your iOS client's REVERSED_CLIENT_ID:
+	     reverse the iOS client ID, e.g.
+	       840818352401-abc123.apps.googleusercontent.com
+	     becomes
+	       com.googleusercontent.apps.840818352401-abc123
+	     (this is also the REVERSED_CLIENT_ID value in GoogleService-Info.plist). -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID_SUFFIX</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

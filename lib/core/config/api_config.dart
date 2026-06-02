@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConfig {
-  static const String baseUrl =
-      String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:3001/api');
+  /// Base URL read from `.env` → `API_BASE_URL`.
+  /// Falls back to localhost when the key is absent (simulator / emulator).
+  static String get baseUrl =>
+      dotenv.env['API_BASE_URL'] ?? 'http://localhost:3001/api';
 
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
@@ -11,6 +14,9 @@ class ApiConfig {
   // Auth endpoints
   static const String loginPath = '/auth/login';
   static const String refreshPath = '/auth/refresh';
+  static const String providersPath = '/auth/providers';
+  // Social login: POST with { token } → same envelope as /auth/login.
+  static String socialTokenPath(String provider) => '/auth/$provider/token';
 
   // Store endpoints
   static const String myStoresPath = '/my/stores';

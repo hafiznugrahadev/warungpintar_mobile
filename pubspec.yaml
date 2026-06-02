@@ -26,8 +26,8 @@ dependencies:
   # Secure storage
   flutter_secure_storage: ^9.2.4
 
-  # Barcode scanner
-  mobile_scanner: ^6.0.10
+  # Barcode scanner — 7.x supports arm64 iOS simulators (iOS 16.0+)
+  mobile_scanner: ^7.0.0
 
   # i18n (slang — type-safe translations)
   slang: ^4.5.0
@@ -41,8 +41,11 @@ dependencies:
   # UI utilities
   cupertino_icons: ^1.0.8
   flutter_dotenv: ^6.0.1
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0

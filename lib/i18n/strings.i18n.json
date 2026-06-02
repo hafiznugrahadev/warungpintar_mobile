@@ -22,7 +22,10 @@
     "loginButton": "Sign In",
     "loginFailed": "Invalid email or password",
     "selectStore": "Select Store",
-    "selectStoreSub": "Choose which store to work with"
+    "selectStoreSub": "Choose which store to work with",
+    "orContinueWith": "or continue with",
+    "continueWithGoogle": "Continue with Google",
+    "googleSignInFailed": "Google sign-in failed"
   },
   "cashier": {
     "title": "Cashier",

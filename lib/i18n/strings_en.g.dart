@@ -130,6 +130,15 @@ class Translations$auth$en {
 
 	/// en: 'Choose which store to work with'
 	String get selectStoreSub => 'Choose which store to work with';
+
+	/// en: 'or continue with'
+	String get orContinueWith => 'or continue with';
+
+	/// en: 'Continue with Google'
+	String get continueWithGoogle => 'Continue with Google';
+
+	/// en: 'Google sign-in failed'
+	String get googleSignInFailed => 'Google sign-in failed';
 }
 
 // Path: cashier
@@ -410,6 +419,9 @@ extension on Translations {
 			'auth.loginFailed' => 'Invalid email or password',
 			'auth.selectStore' => 'Select Store',
 			'auth.selectStoreSub' => 'Choose which store to work with',
+			'auth.orContinueWith' => 'or continue with',
+			'auth.continueWithGoogle' => 'Continue with Google',
+			'auth.googleSignInFailed' => 'Google sign-in failed',
 			'cashier.title' => 'Cashier',
 			'cashier.scanBarcode' => 'Scan Barcode',
 			'cashier.manualSearch' => 'Search product...',

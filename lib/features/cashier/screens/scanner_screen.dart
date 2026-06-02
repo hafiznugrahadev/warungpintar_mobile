@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,13 @@ import '../../../core/config/app_constants.dart';
 import '../providers/product_provider.dart';
 import '../providers/cart_provider.dart';
 
+// Detect iOS Simulator: on a real device `dart.vm.product` is true (AOT compiled);
+// on a simulator the Dart VM is in JIT/debug mode so the flag is false.
+// We additionally gate on Platform.isIOS so this only fires for iOS.
+bool get _isIOSSimulator =>
+    Platform.isIOS &&
+    const bool.fromEnvironment('dart.vm.product') == false;
+
 class ScannerScreen extends ConsumerStatefulWidget {
   const ScannerScreen({super.key});
 
@@ -17,14 +25,22 @@ class ScannerScreen extends ConsumerStatefulWidget {
 }
 
 class _ScannerScreenState extends ConsumerState<ScannerScreen> {
-  final MobileScannerController _controller = MobileScannerController();
+  MobileScannerController? _controller;
   Timer? _debounce;
   bool _processing = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (!_isIOSSimulator) {
+      _controller = MobileScannerController();
+    }
+  }
+
+  @override
   void dispose() {
     _debounce?.cancel();
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -79,6 +95,42 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   Widget build(BuildContext context) {
     final t = Translations.of(context);
 
+    // Graceful degradation: MobileScanner uses MLKit which is not available
+    // on iOS arm64 simulators (iOS 26+). Show a placeholder instead of crashing.
+    if (_isIOSSimulator) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          title: Text(t.cashier.scanBarcode),
+        ),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.videocam_off, color: Colors.white54, size: 64),
+                SizedBox(height: 16),
+                Text(
+                  'Scanner not available in simulator',
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Use a physical device to scan barcodes.',
+                  style: TextStyle(color: Colors.white38, fontSize: 13),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -89,7 +141,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       body: Stack(
         children: [
           MobileScanner(
-            controller: _controller,
+            controller: _controller!,
             onDetect: _onBarcodeDetected,
           ),
           _ScannerOverlay(),

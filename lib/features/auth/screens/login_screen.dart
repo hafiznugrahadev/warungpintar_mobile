@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../i18n/strings.g.dart';
+import '../../../core/config/auth_config.dart';
 import '../providers/auth_provider.dart';
+import '../services/google_signin_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
+  bool _googleLoading = false;
 
   @override
   void dispose() {
@@ -35,11 +38,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle(String serverClientId) async {
+    setState(() => _googleLoading = true);
+    try {
+      final idToken =
+          await GoogleSignInService.instance.signInAndGetIdToken(
+        serverClientId: serverClientId,
+        iosClientId: AuthConfig.googleIosClientId,
+      );
+      if (idToken == null) return; // user cancelled
+
+      final success = await ref
+          .read(authProvider.notifier)
+          .socialLogin('google', idToken);
+      if (!mounted) return;
+      if (success) context.go('/store-select');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${Translations.of(context).auth.googleSignInFailed}: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _googleLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Translations.of(context);
     final state = ref.watch(authProvider);
     final theme = Theme.of(context);
+    // Backend is the source of truth for which social providers are enabled.
+    final googleProvider = ref.watch(googleProviderProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -128,11 +161,75 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             )
                           : Text(t.auth.loginButton),
                     ),
+                    if (googleProvider?.clientId != null) ...[
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              t.auth.orContinueWith,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                          const Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: _googleLoading || state.isLoading
+                            ? null
+                            : () => _signInWithGoogle(
+                                  googleProvider!.clientId!,
+                                ),
+                        icon: _googleLoading
+                            ? const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2),
+                              )
+                            : const _GoogleLogo(),
+                        label: Text(t.auth.continueWithGoogle),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 32),
                   ],
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Simple branded "G" mark for the Google button.
+/// Replace with the official multicolour asset if you add one to `assets/`.
+class _GoogleLogo extends StatelessWidget {
+  const _GoogleLogo();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 18,
+      width: 18,
+      child: Center(
+        child: Text(
+          'G',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF4285F4), // Google blue
+            height: 1,
           ),
         ),
       ),

@@ -18,38 +18,40 @@ This installs all packages declared in `pubspec.yaml` into `.dart_tool/` and `.p
 
 ## 2. Configure the API URL
 
-The app reads the backend base URL from the `--dart-define` compile flag. For local development, the default is `http://localhost:3001/api`:
+Copy `.env.example` to `.env` and set your backend URL:
 
 ```bash
-# Run with the default (backend on localhost:3001)
-flutter run
-
-# Override for a real device or different host
-flutter run --dart-define=API_BASE_URL=http://192.168.1.100:3001/api
+cp .env.example .env
 ```
 
-The value is read in `lib/core/config/api_config.dart`:
-```dart
-static const String baseUrl = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'http://localhost:3001/api',
-);
+Edit `.env`:
+```env
+# Simulator / emulator (default)
+API_BASE_URL=http://localhost:3001/api
+
+# Real device on the same Wi-Fi (replace with your Mac's LAN IP)
+# API_BASE_URL=http://192.168.1.x:3001/api
 ```
 
-💡 **Real device testing:** `localhost` on a phone points to the phone itself, not your Mac. Replace it with your Mac's LAN IP (e.g. `192.168.1.x`).
+`.env` is loaded at startup via `flutter_dotenv` and read by `ApiConfig.baseUrl`. The file is **git-ignored** (`.env.example` is the committed reference).
+
+💡 **Real device:** `localhost` on a phone points to the phone itself, not your Mac. Use `ipconfig getifaddr en0` (macOS) to find your LAN IP.
 
 ## 3. Run the app
 
 ```bash
-# Debug (hot reload)
+# Debug — reads API_BASE_URL from .env
 flutter run
 
 # Release build (Android APK)
-flutter build apk --dart-define=API_BASE_URL=https://api.yourserver.com/api
+# Edit .env first, then:
+flutter build apk --release
 
 # Release build (iOS)
-flutter build ipa --dart-define=API_BASE_URL=https://api.yourserver.com/api
+flutter build ipa --release
 ```
+
+> For CI/CD, override `.env` before building or inject the variable via your pipeline's secret manager (do not commit secrets).
 
 ## 4. Demo accounts
 
@@ -72,10 +74,12 @@ This reads `lib/i18n/strings.i18n.json` + `strings_id.i18n.json` and regenerates
 
 | Symptom | Fix |
 | --- | --- |
+| iOS pod install error — "higher minimum deployment target" | `mobile_scanner 6.x` requires iOS ≥ 15.5. Already set in `ios/Podfile` and `project.pbxproj`. Run `cd ios && pod install` to apply. |
 | Products list empty | Backend `limit` was >100; fixed in `AppConstants.productLoadLimit = 100` |
 | Scanner not opening | Add camera permission in `AndroidManifest.xml` / `Info.plist` (already included in scaffold) |
-| `localhost` unreachable on device | Use your Mac's LAN IP as `API_BASE_URL` |
+| `localhost` unreachable on device | Use your Mac's LAN IP in `.env` (`ipconfig getifaddr en0`) |
 | Token expired on start | The app restores the session from `flutter_secure_storage`; an expired access token is refreshed automatically on the first API call |
+| `.env` not found at runtime | Make sure `.env` is listed under `flutter.assets` in `pubspec.yaml` and the file exists |
 
 ## Next
 

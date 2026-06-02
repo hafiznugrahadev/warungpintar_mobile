@@ -1,28 +1,51 @@
+/// Global permission flags returned by `GET /auth/me`.
+/// The backend derives these from `user.role` — the app reads flags instead
+/// of comparing role strings directly.
+class UserPermissions {
+  final bool canAccessAdmin;
+  final bool canManageIntegrations;
+  final bool canManageUsers;
+
+  const UserPermissions({
+    this.canAccessAdmin = false,
+    this.canManageIntegrations = false,
+    this.canManageUsers = false,
+  });
+
+  factory UserPermissions.fromJson(Map<String, dynamic> json) {
+    return UserPermissions(
+      canAccessAdmin: json['canAccessAdmin'] as bool? ?? false,
+      canManageIntegrations: json['canManageIntegrations'] as bool? ?? false,
+      canManageUsers: json['canManageUsers'] as bool? ?? false,
+    );
+  }
+}
+
 class User {
   final String id;
   final String name;
   final String email;
   final String role;
-  final List<String> permissions;
+  final UserPermissions permissions;
 
   const User({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
-    this.permissions = const [],
+    this.permissions = const UserPermissions(),
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final permsRaw = json['permissions'];
     return User(
       id: json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
       role: json['role'] as String? ?? 'CASHIER',
-      permissions: (json['permissions'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
+      permissions: permsRaw is Map<String, dynamic>
+          ? UserPermissions.fromJson(permsRaw)
+          : const UserPermissions(),
     );
   }
 
@@ -31,7 +54,6 @@ class User {
         'name': name,
         'email': email,
         'role': role,
-        'permissions': permissions,
       };
 }
 

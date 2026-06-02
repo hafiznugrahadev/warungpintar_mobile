@@ -22,7 +22,10 @@
     "loginButton": "Masuk",
     "loginFailed": "Email atau kata sandi salah",
     "selectStore": "Pilih Toko",
-    "selectStoreSub": "Pilih toko yang ingin dikelola"
+    "selectStoreSub": "Pilih toko yang ingin dikelola",
+    "orContinueWith": "atau lanjutkan dengan",
+    "continueWithGoogle": "Lanjutkan dengan Google",
+    "googleSignInFailed": "Gagal masuk dengan Google"
   },
   "cashier": {
     "title": "Kasir",

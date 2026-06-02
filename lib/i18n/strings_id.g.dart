@@ -84,6 +84,9 @@ class _Translations$auth$id implements Translations$auth$en {
 	@override String get loginFailed => 'Email atau kata sandi salah';
 	@override String get selectStore => 'Pilih Toko';
 	@override String get selectStoreSub => 'Pilih toko yang ingin dikelola';
+	@override String get orContinueWith => 'atau lanjutkan dengan';
+	@override String get continueWithGoogle => 'Lanjutkan dengan Google';
+	@override String get googleSignInFailed => 'Gagal masuk dengan Google';
 }
 
 // Path: cashier
@@ -234,6 +237,9 @@ extension on TranslationsId {
 			'auth.loginFailed' => 'Email atau kata sandi salah',
 			'auth.selectStore' => 'Pilih Toko',
 			'auth.selectStoreSub' => 'Pilih toko yang ingin dikelola',
+			'auth.orContinueWith' => 'atau lanjutkan dengan',
+			'auth.continueWithGoogle' => 'Lanjutkan dengan Google',
+			'auth.googleSignInFailed' => 'Gagal masuk dengan Google',
 			'cashier.title' => 'Kasir',
 			'cashier.scanBarcode' => 'Pindai Barcode',
 			'cashier.manualSearch' => 'Cari produk...',
